@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Predicción</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function realizarPrediccion(event) {
+            event.preventDefault();
+            const Credit_History = document.getElementById('creditHistory').value;
+            const ApplicantIncome = document.getElementById('applicantIncome').value;
+            const LoanAmount = document.getElementById('loanAmount').value;
+            const CoapplicantIncome = document.getElementById('coapplicantIncome').value;
+            const Dependents = document.getElementById('dependents').value;
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `Credit_History=${Credit_History}&ApplicantIncome=${ApplicantIncome}&LoanAmount=${LoanAmount}&CoapplicantIncome=${CoapplicantIncome}&Dependents=${Dependents}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('resultado').innerText = 'Error: ' + data.error;
+                } else {
+                    if(data.Predicción == 1) {
+                        document.getElementById('resultado').innerText = 'El préstamo fue Aprobado';
+                    } else {
+                        document.getElementById('resultado').innerText = 'El préstamo fue Denegado';
+                    }
+                }
+            })
+            .catch(error => {
+                document.getElementById('resultado').innerText = 'Error en la solicitud.';
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+        <h1 class="text-3xl font-bold mb-8 text-center text-gray-800">Realizar Predicción</h1>
+        <form id="formulario" onsubmit="realizarPrediccion(event)" class="space-y-6">
+            <div>
+                <label for="creditHistory" class="block text-sm font-medium text-gray-700">Historial Crediticio:</label>
+                <select id="creditHistory" name="creditHistory" class="mt-1 block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="1">Sí</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+            <div>
+                <label for="applicantIncome" class="block text-sm font-medium text-gray-700">Ingresos de la solicitante:</label>
+                <input type="text" id="applicantIncome" name="applicantIncome" class="mt-1 block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="loanAmount" class="block text-sm font-medium text-gray-700">Monto del préstamo:</label>
+                <input type="text" id="loanAmount" name="loanAmount" class="mt-1 block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="coapplicantIncome" class="block text-sm font-medium text-gray-700">Ingresos del cosolicitante:</label>
+                <input type="text" id="coapplicantIncome" name="coapplicantIncome" class="mt-1 block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="dependents" class="block text-sm font-medium text-gray-700">Dependientes:</label>
+                <select id="dependents" name="dependents" class="mt-1 block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">+3</option>
+                </select>
+            </div>
+            <div>
+                <input type="submit" value="Enviar" class="w-full bg-indigo-600 text-white font-medium py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            </div>
+        </form>
+        <p id="resultado" class="mt-4 text-lg font-semibold text-center"></p>
+    </div>
+</body>
+</html>
